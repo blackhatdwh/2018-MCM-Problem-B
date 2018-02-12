@@ -1,31 +1,3 @@
-%%
-%% This is file `mcmthesis-demo.tex',
-%% generated with the docstrip utility.
-%%
-%% The original source files were:
-%%
-%% mcmthesis.dtx  (with options: `demo')
-%% 
-%% -----------------------------------
-%% 
-%% This is a generated file.
-%% 
-%% Copyright (C)
-%%     2010 -- 2015 by Zhaoli Wang
-%%     2014 -- 2016 by Liam Huang
-%% 
-%% This work may be distributed and/or modified under the
-%% conditions of the LaTeX Project Public License, either version 1.3
-%% of this license or (at your option) any later version.
-%% The latest version of this license is in
-%%   http://www.latex-project.org/lppl.txt
-%% and version 1.3 or later is part of all distributions of LaTeX
-%% version 2005/12/01 or later.
-%% 
-%% This work has the LPPL maintenance status `maintained'.
-%% 
-%% The Current Maintainer of this work is Liam Huang.
-%% 
 \documentclass{mcmthesis}
 \mcmsetup{CTeX = false,
         tcn = 87076, problem = B,
@@ -38,6 +10,10 @@
 \usepackage{amssymb}
 \usepackage{nicefrac}
 \usepackage{url}
+\usepackage{graphicx}
+\usepackage{tabu}
+\usepackage{float}
+\usepackage{subcaption}
 \newcommand\bsfrac[2]{%
 \scalebox{-1}[1]{\nicefrac{\scalebox{-1}[1]{$#1$}}{\scalebox{-1}[1]{$#2$}}}%
 }
@@ -45,8 +21,14 @@
 \title{2068: A Linguistic Odyssey}
 \begin{document}
 \begin{abstract}
+In part one of the question, we are required to build a model to predict the changing trend of demographic and geographic distribution of various languages in the next 50 years. We achieved this by classifying languages spoken in a country into three categories, and assign different growth pattern to them. With three difference equations which take numerous factors into consideration and the carefully-estimated initial state, we examine most populous countries to obtain the future of languages. While it is easy to come up with this idea, it is hard to collect enough data for initial state estimation and adjust parameters to make the model meet the reality. One more difficulty in this part is that the accuracy of our model is hard to measure, since no one can see the future. We made some effort in this regard by trying to predict the current distribution state using our model and historical data.
+
+In part two of the question, according to our choice, we are required to offer the recommendation as to the number and placement of the new international offices. Regarding it as a multi-objective analysis problem, we apply AHP model to calculate weight of different factors play in the selection process. The coverage of languages supplied in different proposal measured by speakers' ratio is the indicator of the most influential element -- the market size in this model. Though it will be normally regarded as a set covering problem which is NP-hard. The problem could be solved by employing comparatively simple algorithm at an acceptable cost, considering its relatively finite number of schemes. Through calculating the proportional weight of each proposal, we satisfactorily analysis the optimum location on different condition of time and number of offices, and get the language used in each office.
+
+The sensitive analysis of our model has pointed out the small alternation in our input (including the crude birth rate, death rate, immigrant rate, emigrant rate of each country) have little effect to our output of prediction of the distribution of different language generally. Also we find after taking the modern advancement in communication technology, the selection of the location remains the same, which indicates communicate cost is not an important factor intervening our decision.
+
 \begin{keywords}
-keyword1; keyword2
+Difference Equation; AHP; Sensitive Analysis;
 \end{keywords}
 \end{abstract}
 \maketitle
@@ -65,8 +47,8 @@ To help our client achieve tangible benefits, we need to use our model to find o
 \begin{enumerate}
     \item \textbf{Every country has a native language. Everyone born in that country can master it.} The native language refers to the most commonly used language in a country. Living in an environment where most people around you speak that language, it is reasonable to infer that you can master that language.
     \item \textbf{Some countries have an official promoted language. Educated people in that country can master it.} The official promoted language refers to the most commonly studied foreign language in a country. Since it is taught in most schools in that country, we can assume that people finish their basic education can master it.
-    \item \textbf{The birth / death / immigration / emigration rate of every country is a constant.} This is a helpless choice, given that we were unable to find enough historical data to predict future trends.
-    \item \textbf{Among all the immigrants in a given country, the distribution of languages they use is the same as the distribution of languages in the world.} Here we assume that immigrants come from all over the world evenly to simplify our model.
+    \item \textbf{The birth\cite{wiki:birth} / death\cite{wiki:death} / immigration\cite{wiki:im} / emigration\cite{wiki:em} rate of every country is a constant.} This is a helpless choice, given that we were unable to find enough historical data to predict future trends.
+    \item \textbf{Among all the immigrants in a given country, the distribution of languages they use is the same as the distribution of languages in the world\cite{wiki:proportion}.} Here we assume that immigrants come from all over the world evenly to simplify our model.
 
 \end{enumerate}
 \subsection{Notations}
@@ -89,14 +71,15 @@ To help our client achieve tangible benefits, we need to use our model to find o
     $L_{ijt}$ & The proportion of people using language $j$ in year $t$ in country $i$.\\ \hline
     $L_{int}$ & The proportion of people using the native language in year $t$ in country $i$.\\ \hline
     $x_i$ & The education index\cite{wiki:edu} of country $i$.\\ \hline
-    $y_i$ & The proportion of internet user in country $i$.\\ \hline
-    $z_j$ & The international influence index of language $j$. $z_j=T_j F_j/TF$, where $T_j$ is the number of tourists travel to $S_j$, $T$ is the total number of tourists in the world, $F_j$ is the foreign trade amount in $S_j$, and $F$ is the total foreign trade amount in the world.\\ \hline
+    $y_i$ & The proportion of internet user in country $i$\cite{wiki:internet}.\\ \hline
+    $z_j$ & The international influence index of language $j$. $z_j=T_j F_j/TF$, where $T_j$ is the number of international tourism receipts$S_j$\cite{wiki:travel}, $T$ is the total number of international tourism receipts in the world, $F_j$ is the foreign trade amount in $S_j\cite{wiki:trade}$, and $F$ is the total foreign trade amount in the world.\\ \hline
 
 \end{tabularx}
 
 
 \section{Model}
 \subsection{Model One}
+\subsubsection{Model Description}
 We apply difference equation to form our model for part one of the problem. The evolution and competition of languages are affected by economic, social and environmental factors, which finally forms a complicated and unpredictable system. But by the usage of recurrence relation, things get much simpler. We can take all possible factors into consideration and form a extremely complex recurrence formula, but once we get the initial state of the system, we can let the computer handle everything else.
 
 We classify languages spoken in a given country into three categories, the native language, the official promoted language, and other languages. They were introduced in section \ref{ssec:1}, and they change in three different patterns.
@@ -143,7 +126,7 @@ At last, we are going to review the recurrence formula of language $j$, which is
 \begin{equation} \label{eq:3}
     L_{ijt}=\frac{L_{ijt'}N_{it'}(1-D_{it'}-E_{it'})+L_{jt'}N_{it'}I_{ijt'}+{L_{jt'}}^\alpha {z_j}^\theta {x_i}^\gamma {y_i}^\beta N_{it'} (1-I_{ijt'})}{N_{it'}(1+B_{it'}-D_{it'}+I_{it'}-E_{it'})}
 \end{equation}
-\begin{equation*}
+ \begin{equation*}
     t'=t-1
 \end{equation*}
 
@@ -153,10 +136,287 @@ Those natives of country $i$ who do not speak language $j$ also have some possib
 
 Now that we have established the recurrence relation of the usage rate of all languages spoken in a given country, we only need the initial state to run the model.
 
+\subsubsection{Testing Result}
+Figure \ref{fig:surface} illustrate the changing trend of 26 languages in the next 50 years. Some languages gradually become more popular, while some others maintain at a steady level. There is one language whose usage rate has experienced an dramatically increase and occupy absolute dominance in the next 30 years. That's English. We think this is because English is promoted by most governments all round the world, since it is currently the most popular language. We can conclude that language competition is a positive feedback process. The more popular the language, the more people will learn it, which in turn lead to the increase of the language's popularity.
+\begin{figure}[h!]
+    \includegraphics[width=\linewidth]{./figures/surface.png}
+    \caption{Total Language Speaker Amount Changing Trend} \label{fig:surface}
+\end{figure}
+
+Figure \ref{fig:2068} shows the language distribution (total) in 2068. The top 10 languages are listed in table \ref{tbl:top10}. Compare with the top 10 languages in 2018, We can see that Arabic, Portuguese, Russian, Punjabi and Japanese are out of the top ten, while Italian, Telugu, Marathi, Tamil and French enter the top ten.
+
+Figure \ref{fig:map0} to Figure \ref{fig:map50} show the changing trend of geographical distribution of native languages in the next 50 years.
+
+
+\begin{figure}[h!]
+    \includegraphics[width=\linewidth]{./figures/2068plus.png}
+    \caption{Language Distribution (total) in 2068} \label{fig:2068}
+\end{figure}
+
+
+\begin{table}[h!]
+\centering
+\caption{Top 10 Languages in 2068}
+\label{tbl:top10}
+\begin{tabular}{|l|l|l|l|l|l|l|}
+\cline{1-3} \cline{5-7}
+Rank & Language   & Total Speaker Rate&  & Rank & Language & Total Speaker Rate\\ \cline{1-3} \cline{5-7}
+1    & English    & 0.987             &  & 6    & Bengali  & 0.267             \\ \cline{1-3} \cline{5-7}
+2    & Italian    & 0.585             &  & 7    & Telugu   & 0.236             \\ \cline{1-3} \cline{5-7}
+3    & Spanish    & 0.553             &  & 8    & Marathi  & 0.235             \\ \cline{1-3} \cline{5-7}
+4    & Mandarin   & 0.466             &  & 9    & Tamil    & 0.232             \\ \cline{1-3} \cline{5-7}
+5    & Hindustani & 0.285             &  & 10   & French   & 0.197             \\ \cline{1-3} \cline{5-7}
+\end{tabular}
+\end{table}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\linewidth]{./figures/map0.png}
+    \caption{Geographic Distribution of Languages in 2018} \label{fig:map0}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\linewidth]{./figures/map10.png}
+    \caption{Geographic Distribution of Languages in 2028} \label{fig:map10}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\linewidth]{./figures/map25.png}
+    \caption{Geographic Distribution of Languages in 2043} \label{fig:map25}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\linewidth]{./figures/map50.png}
+    \caption{Geographic Distribution of Languages in 2068} \label{fig:map50}
+\end{figure}
+
+
 
 \subsection{Model Two}
+For the sake of expanding global market,explicitly we will not choose two site in a same country,otherwise their advantage of getting information and catering to people speaking different language will overlap,leading to a unreasonable structure and distribution of the resource.So we ignore the other city of China mainland and the USA, and the list of our preselection are Madrid, Sao Paulo, Vienna, Toronto, Hongkong, Paris, Berlin, Munich, Mumbai, Deri, Roma, Milan, Tokyo, Mexico City, Lisbon, Moscow, Singapore City, Seoul, Zurich, Istanbul, London, New York, Los Angeles , Chicago, Washington, Dubai.
+
+In order to thoroughly analysis the utility of the different schemes of selecting optimal location for transnational corporation,we take multiple factors concerning with both benefit and cost into consideration. Applying AHP model to determine the different weight of each criteria, and for each criteria we choose a quantified indicator so that we can calculate the relative weight of each schemes by calculating the feature factor of comparison matrix of project hierarchy. We preselect 20 cities according to some familiar necessary condition such as robust development of economy, direct connection to the other main cities and dense population supplying abundance human resources. Through simply sorting their relative weight, we obtain the most suitable plan for determining location.
+
+\begin{figure}[h!]
+    \includegraphics[width=\linewidth]{./figures/AHP.png}
+\end{figure}
+
+\begin{align*}
+\begin{matrix}
+ & Benefit & Cost\\
+Benefit & 1 & 1\\
+Cost & $\nicefrac{1}{3}$ & 1
+\end{matrix}
+\end{align*}
+
+\begin{align*}
+\begin{matrix}
+    &Market&Info&Talent&Convenience\\
+    Market&1&9&5&3\\
+    Info&\nicefrac{1}{9}&1&\nicefrac{1}{2}&\nicefrac{1}{3}\\
+    Talent&\nicefrac{1}{5}&2&1&\nicefrac{1}{2}\\
+    Convenience&\nicefrac{1}{3}&3&2&1
+\end{matrix}
+\end{align*}
+
+\begin{align*}
+\begin{matrix}
+    &Running\_Cost&Communication\_Cost\\
+    Running\_Cost&1&2\\
+    Communication\_Cost&\nicefrac{1}{2}&1
+\end{matrix}
+\end{align*}
+In order to better express of model, we let $c_1,...c_m$ denotes the number of sites and $s_1,...s_n$, $MAR_1,...MAR_n$ indicates the market performance of each scheme, $HR_1,...HR_n$ indicates each scheme's average depth of talent pool, $INFO_1,...INFO_n$ judges each scheme's ability of having access to fresh information. $TRANS_1,....TRANS_n$ means the traffic convenience of each scheme, measured by average geography distance between every city in the scheme. $M_1...M_n$ represent for average cost of renting office building in each scheme, indicating the land price level of those city, which is strongly associated with the running cost in different city. $COMMU_1,...COMMU_n$ sign for the communication cost increasing when the necessary communication patterns between different language increase. Finally we define $k_i$ as the number of language covered by scheme $s_i$.
+
+\subsubsection{The Factors}
+\paragraph{The Market}
+Undoubtedly, the market size plays the essential role in deciding the scale of transaction, which mainly depends on the coverage of audience worldwide.For the sake of international deals base on a mutual fully-understanding environment, it seems natural to hypothesis the number of speakers speaking languages supplied by the selected sites as an indicator of potential market. Then the problem is some kind transformed by We take $\alpha$ as a threshold which means that one language is defined to be covered by a city if the using rate of the language is beyond $\alpha$. According to the predicted distribution of various languages in different country in future, we fix the threshold $\alpha$ to be 0.5.
+
+\begin{equation*}
+    Cov_\theta=\sum L_{jt}, j\in \{languages\ covered\ by\ scheme\ \theta\}
+\end{equation*}
+
+$Cov_\theta$ denotes for the portion of population speaking language covered by the scheme in the total population.
+
+Though it seems to be a rough estimation because our model is not precise enough to truly take every polyglot into account,it can reflect the relative ability to exploit worldwide market to some extent .
+
+To evaluate the different plan's performance in exploring the outside market in a more reasonable manner,we develop a scale system to quantify their potential market size.
+
+
+\noindent \begin{tabu} to \linewidth { X[c]  X[c]}
+    \hline
+  \textbf{$Cov_\theta$} & \textbf{$MAR_\theta$} \\ \hline
+    $100\%>Cov\geqslant90\%$ & 10\\
+    $90\%>Cov\geqslant75\%$ & 8\\
+    $75\%>Cov\geqslant60\%$ & 6\\
+    $60\%>Cov\geqslant50\%$ & 4\\
+    $50\%>Cov\geqslant30\%$ & 2\\
+    $30\%>Cov\geqslant0\%$ & 1\\ \hline
+\end{tabu}
+
+
+\paragraph{Easy Access to Information}
+In fiercely fluctuating business world, having quick access to first-hand information or is the crucial way to go behind others towards. The access to fresh information is related to the relative status of the city in its state of political and financial aspect. We assume that information from separated country all contributes to the benefit of the corporation. So we categorize the pre-selected cities into 4 divides.
+
+\noindent \begin{tabu} to \linewidth { X[c]  X[c]}
+    \hline
+    Type of the city $i$ & Info\_Score $i$\\ \hline
+    Neither financial center or political center & 1\\
+    Financial center but not political center & 2\\
+    Political center but not financial center & 2\\
+    Both political center and financial center & 4\\ \hline
+\end{tabu}
+
+\begin{equation*}
+    INFO_\theta=\sum Info\_Score_i,\ i\in \{cities\ containing\ in\ the\ scheme\ \theta\}
+\end{equation*}
+
+\paragraph{Talent Pool}
+Sufficient and qualified practitioners especially experts is also a key element in competing and also improving the rate and frequency of accomplishing deals. We take the average number of university ranking beyond 300 in the nearby distriction as an indicator of the plan's depth of talent pool, since the personnel having experienced top level of education are far more valuable than those who only receive a normal level of higher education. We selected an authorized rank from ARWU\cite{wiki:ARWU} to assess the level of various university.
+
+\begin{equation*}
+    uni_\theta=\frac{\sum uni_i}{n},\ i\in \{cities\ containing\ in\ the\ scheme\ \theta\}
+\end{equation*}
+
+$n$ denotes for the number of the cities included, and $uni_i$ denotes the number of university ranking beyond 300 in city $i$.
+
+\noindent \begin{tabu} to \linewidth { X[c]  X[c]}
+    \hline
+    $uni_i$ & $HR_\theta$ \\ \hline
+    $\geqslant 5$ & 10\\
+    4 & 8\\
+    3 & 6\\
+    2 & 4\\
+    1 & 2\\
+    0 & 1\\ \hline
+\end{tabu}
+
+
+\paragraph{Transportation}
+Except for direction connection to other main cities. The location of each corporation had better close to each other for reducing the possible cost such as personnel transferring and work survey. When considering the rapid advancement technology of communication. The weight of this factor will noticeably incline. We choose the average distance between each other city included in the scheme as an indicator of this factor.
+
+Through extracting data from Google earth and fill them in a 20*20 matrix. We obtain the distance of each other city in our preselect list.
+
+\begin{align*}
+    &TRANS_\theta=\frac{\sum d(i, j)}{n},\ 1\leqslant i<j\leqslant n\\
+    &d(i, j)\ denotes\ the\ average\ distance\ of\ city\ i\ and\ j
+\end{align*}
+
+
+\paragraph{Running Cost}
+For we do not know the specific business the multinational corporation majors in, we assume the cost of the raw material and transportation is fixed. Then the rest of running cost of a company is mostly composed of the land price level of the city and the labor cost which also significantly associated with the land price. We assume their land price level stand for still to simplify the process of predicting its trend,which we believe make little sense of the result. We conjecture that the land price level of a city is generally proportional to the average rent level of office building in the CBD. We could simple take the reciprocal of gross rent of cities covered by the project as the indicator of running cost, since in a comparison matrix, relative cost other than absolute cost is, regardless of the unit.
+
+\begin{align*}
+    &M_\theta=\frac{1}{\sum m_i},\ i\in \{ cities\ containing\ in\ the\ scheme\ \theta\}
+\end{align*}
+
+$m_i$ denotes the average rent of office building in the city $i$ per square in Euro. The statistical data is from a publication from OSATW in 2014\cite{wiki:OSATW}.
+\paragraph{Communication Cost}
+The diversity of the languages the schemes will increase the potential communicate cost because we need to provide more patterns of communication environment between different languages, including hiring interpreters in different field, preparing data and information in different languages for necessity. Considering the possible number of communication pattern $\binom{2}{k}$ determined by the total number k of languages, the difficulty and complexity of cross-linguistic communication can be almost judged by the square of k. Similarly,When considering the rapid advancement technology of communication. The weight of this factor will noticeably incline, and much context in different language will be already prepared.
+
+
+\begin{align*}
+    COMMU_\theta={k_\theta}^2
+\end{align*}
+
+$k_\theta$ denote for the number of languages covered by the project $\theta$.
+
+\subsubsection{The Parameters of the Constraint}
+The number of site location:
+\begin{itemize}
+    \item Part 1: $n=6$
+    \item Part 2: $n\leqslant6$
+\end{itemize}
+The time $t$ for observing the change of consequence during short period and long period are successively set up to 5 and 10.
+
+\noindent The comparison matrix of criterion hierarchy and comparison matrix of project hierarchy are attached to the appendix.
+
+\subsubsection{Testing Result}
+We respectively consider location choice after ten years and after fifty years and on the condition of n=6 and n<=6. With compilation of MATLAB,we can find the optimal locations for international office.
+
+\begin{table}[H]
+\centering
+\caption{Alternate Location for New Offices}
+\label{tbl:office}
+\begin{tabular}{|l|l|l|}
+\hline
+               &$N=6$                                                                                                    &$N\leqslant6$                                                                                            \\ \hline
+10 Years After & \begin{tabular}[c]{@{}l@{}}Sao Paulo, Mumbai, \\ Paris, Berlin,\\  Tokyo, Singapore City\end{tabular} & \begin{tabular}[c]{@{}l@{}}Sao Paulo, Mumbai,\\  Paris, Berlin,\\  Tokyo, Singapore City\end{tabular} \\ \hline
+50 Years After & \begin{tabular}[c]{@{}l@{}}Sao Paulo, Mumbai,\\  Paris, Singapore City\end{tabular}                   & \begin{tabular}[c]{@{}l@{}}Sao Paulo, Mumbai, \\ Paris,Singapore City\end{tabular}                    \\ \hline
+\end{tabular}
+\end{table}
+
+These offices speak languages as follow:
+\begin{itemize}
+    \item \textbf{Sao Paulo}: Spanish, Portuguese, English
+    \item \textbf{Mumbai}: Hindustani, Bengali, Tamil, Marathi, English
+    \item \textbf{Paris}: French, English, Arabic
+    \item \textbf{Berlin}: Germany, English
+    \item \textbf{Tokyo}: Japanese, English
+    \item \textbf{Singapore City}: Malay, Mandarin, English
+\end{itemize}
 
 \section{Verification}
+\subsection{Sensitivity Analysis of Model One}
+In our models, some inputs are not precise enough for the lack of actual data about the birth rate, death rate, emigrant rate, and immigrant rate for every country. The most accurate data we can find is from US population division, which only include the average crude birth rate and average death rate. And average net migration rate and emigrant rate for most country. Those input may influence our model. In fact, we cannot obtain the real value and predict the reasonable changing trend of our calculation. Sensitivity Analysis is primarily conducted on these inputs and parameter. In those output, $L_{it}$ is a representative dependent variable which reflects the general changes in all the output.
+
+
+\begin{figure}[H]
+    \includegraphics[width=\linewidth]{./figures/B.png}
+    \caption{Birth Rate}
+\end{figure}
+\begin{figure}[H]
+    \includegraphics[width=\linewidth]{./figures/D.png}
+    \caption{Death Rate}
+\end{figure}
+\begin{figure}[H]
+    \includegraphics[width=\linewidth]{./figures/E.png}
+    \caption{Emigration Rate}
+\end{figure}
+\begin{figure}[H]
+    \includegraphics[width=\linewidth]{./figures/I.png}
+    \caption{Immigration Rate}
+\end{figure}
+
+All the percentage presented on the table represents the maximum fluctuation among $L_{it}$ Therefore $L_{it}$.
+
+\subsection{Sensitivity Analysis of Model Two}
+In our models, we don't estimate the possible influence brought by future communication technology progressing. After we take it into account, comparison matrix of criterion hierarchy II, III become into. Thus altering the weight of different criteria.
+
+\begin{align*}
+    &\begin{matrix}
+    &Market&Info&Talent&Convenience\\
+    Market&1&9&5&5\\
+    Info&\nicefrac{1}{9}&1&\nicefrac{1}{2}&\nicefrac{1}{2}\\
+    Talent&\nicefrac{1}{5}&2&1&1\\
+    Convenience&\nicefrac{1}{5}&2&1&1
+\end{matrix}\\
+    &Consistency\ Ratio:\ 0.0047
+\end{align*}
+
+\begin{align*}
+    &\begin{matrix}
+    &Running\_Cost&Communication\_Cost\\
+    Running\_Cost&1&5\\
+    Communication\_Cost&\nicefrac{1}{5}&1
+\end{matrix}\\
+    &Consistency\ Ratio:\ 0
+\end{align*}
+
+Through the verification of Matlab, the scheme selected after thinking over this factor is
+\begin{table}[H]
+\centering
+\caption{Alternate Location for New Offices 2}
+\begin{tabular}{|l|l|l|}
+\hline
+               &$N=6$                                                                                                    &$N\leqslant6$                                                                                            \\ \hline
+10 Years After & \begin{tabular}[c]{@{}l@{}}Sao Paulo, Mumbai, \\ Paris, Berlin,\\  Tokyo, Singapore City\end{tabular} & \begin{tabular}[c]{@{}l@{}}Sao Paulo, Mumbai,\\  Paris, Berlin,\\  Tokyo, Singapore City\end{tabular} \\ \hline
+50 Years After & \begin{tabular}[c]{@{}l@{}}Sao Paulo, Mumbai,\\  Paris, Singapore City\end{tabular}                   & \begin{tabular}[c]{@{}l@{}}Sao Paulo, Mumbai, \\ Paris,Singapore City\end{tabular}                    \\ \hline
+\end{tabular}
+\end{table}
+
+From the table above, we can see the changing of the selection location for the new factor altering the weight of different criteria is nearly to zero. So it's reasonable to follow those schemes. In conclusion,these verification proves the robustness of our model.
+
 \section{Conclusion}
 Predicting the future of languages is an intricate problem which should take multiple factors into consideration. In our first model, we used three formulas to established the recurrence relation of \textit{Native Language Usage Rate ($L_{int}$)}, \textit{Official Promoted Language Usage Rate ($L_{iot}$)} and \textit{Other Language Usage Rate ($L_{ijt}$)} correspondingly. Then we assessed the current state of language distribution based on massive data we collected, and run the model with the current state as the initial state. The result shows the demographic and geographic distribution of 26 mainstream languages in the next 50 years.
 
@@ -174,7 +434,10 @@ In our second model, we first selected 20 cities as candidates, and used AHP to 
     \item We didn't take most political hot issues into consideration, like British Brexit, European migrant crisis, Chinese peaceful rise, and nuclear crisis in North Korea, etc. These issues may lead us to a totally different future, but due to limited time, they are beyond our reach in the current model.
     \item We assume that one can never forget the language she learn to simplify our model, but this is unlikely to happen in the real world.
     \item We assume that a country's native language and official promoted language never change. But such thing may happen, albeit with a very low probability.
-    \item Although we have found large amount of data, most of them contain only data in one year. Without enough historical data, we were unable to predict their trend in the future, so we can only regard them as constants. This flaw led our model to maintain good performance only in the near future, with much less accuracy in the far future.
+    \item Although we have found large amount of data, most of them contain only data in one year. Without enough historical data, we were unable to predict their changing trend in the future, so we can only regard them as constants. This flaw led our model to maintain good performance only in the near future, with much less accuracy in the far future.
+    \item Through deeply investigating the initial data from different believable sources like Wikipedia and enthonologue. We find Swahili and Hausa,these two most widely-spread language prevailing in African have no precise statistical data.The Wikipedia says that estimates of the total number of Swahili speakers vary widely, from 50 million to over 100 million. Additionally, the number of Hausa speaker have a great difference up to factor of four between enthonologue and the data provided by the chart attached to the problem. For the lack of a fundamental distribution of these two languages currently. We hopelessly choose to ignore the development and change of them.  
+Furthermore, there are thousands of African language popular among African mingling and mottling.However,there is little powerful organization in Africa, and loose settlement pattern where population maintaining at a medium level. According to a famous research by Soren Wichmann "On the Power-Law Distribution of Language Family Sizes" and the latter computer model simulation, the number of languages spoken in a habitation will achieve its maximal when its population at  medium level, conforming to a power-law distribution. This may explain the huge number of prevailing African languages more or less.  
+Above all, we only take a few African country which has a relatively accurate and clear official statistics in to account.
 \end{itemize}
 \section{A Memo to Chief Operating Officer}
 \noindent\textbf{To:} Chief Operating Officer
@@ -185,8 +448,13 @@ In our second model, we first selected 20 cities as candidates, and used AHP to 
 
 \noindent\textbf{Subject:} The Future of Languages and Chance to Seize
 
-\noindent There has been some progress in the research you have commissioned to us. According to our model, 
+\noindent There has been some progress in the research you have commissioned to us. According to our model, after 50 years of evolution, by the time of 2068, English will become the most popular language in the world, with approximately 100\% usage rate. Given the fact that language competition is a positive feedback process and English is currently the most popular language in the world, this prediction is not that surprising. With English, Spanish and Mandarin still rank top five in 2068, we can conclude that the basic pattern of the world won't change, and there is no need to panic. An unbelievable prediction is that Italian is going to be the second most popular language in the world, we ourselves do not have much faith in this regard. We got this result because Italy won the highest score in terms of international influence in European, due to its high number of tourists receiving and forign trade. We hold a wait-and-see attitude towards this, but it does no harm for you to pay more attention to this peace and beautiful country and its cultural output.
 
+To see the future in a broader perspective, here we list the top ten languages in 2068. See Table \ref{tbl:top10}.
+
+In terms of office location selecting, we built another model which takes multiple factors into consideration. Among all 20 candidates, it assigns score to each of them, by evaluating the city's housing price, university amount, transportation convenience and so on. We consider language spoken in a city as one of the most important factors, since this is a service company, and we have to provide native language service to our customers. 
+
+Sorting the list of candidates by score in descending order, the top six is shown in Table \ref{tbl:office}. According to our model, open new offices in these cities is a best choice to save money and earn profit. We make no gurantee, but even if the future of languages is totally different from our prediction, it can never be a bad idea to open new offices in these modern metropolis.
 
 
 \bibliography{87076}
@@ -195,33 +463,4 @@ In our second model, we first selected 20 cities as candidates, and used AHP to 
 
 
 
-\begin{appendices}
-
-\section{First appendix}
-
-
-Here are simulation programmes we used in our model as follow.\\
-
-\textbf{\textcolor[rgb]{0.98,0.00,0.00}{Input matlab source:}}
-\lstinputlisting[language=Matlab]{./code/mcmthesis-matlab1.m}
-
-\section{Second appendix}
-
-some more text \textcolor[rgb]{0.98,0.00,0.00}{\textbf{Input C++ source:}}
-\lstinputlisting[language=C++]{./code/mcmthesis-sudoku.cpp}
-
-\end{appendices}
 \end{document}
-
-%% 
-%% This work consists of these files mcmthesis.dtx,
-%%                                   figures/ and
-%%                                   code/,
-%% and the derived files             mcmthesis.cls,
-%%                                   mcmthesis-demo.tex,
-%%                                   README,
-%%                                   LICENSE,
-%%                                   mcmthesis.pdf and
-%%                                   mcmthesis-demo.pdf.
-%%
-%% End of file `mcmthesis-demo.tex'.
